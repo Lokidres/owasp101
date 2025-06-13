@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insecure Design (Güvensiz Tasarım) | OWASP Top 10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-xl font-semibold text-gray-800">OWASP Top 10</div>
+                <div class="hidden md:flex space-x-4">
+                    <a href="index.html" class="text-gray-800 hover:text-blue-600">Ana Sayfa</a>
+                    <a href="sayfa1.html" class="text-gray-800 hover:text-blue-600">Broken Access Control</a>
+                    <a href="sayfa2.html" class="text-gray-800 hover:text-blue-600">Cryptographic Failures</a>
+                    <a href="sayfa3.html" class="text-gray-800 hover:text-blue-600">Injection</a>
+                    <a href="sayfa4.html" class="text-blue-600">Insecure Design</a>
+                    <a href="sayfa5.html" class="text-gray-800 hover:text-blue-600">Security Misconfiguration</a>
+                    <a href="sayfa6.html" class="text-gray-800 hover:text-blue-600">Vulnerable Components</a>
+                    <a href="sayfa7.html" class="text-gray-800 hover:text-blue-600">Authentication Failures</a>
+                    <a href="sayfa8.html" class="text-gray-800 hover:text-blue-600">Software and Data Integrity</a>
+                    <a href="sayfa9.html" class="text-gray-800 hover:text-blue-600">Logging Failures</a>
+                    <a href="sayfa10.html" class="text-gray-800 hover:text-blue-600">Server-Side Request Forgery</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <article class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Insecure Design (Güvensiz Tasarım)</h1>
+            
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Genel Bakış</h2>
+                <p class="text-gray-600 mb-4">
+                    Bu güvenlik açığı, uygulamanın tasarım aşamasında güvenlik önlemlerinin yeterince düşünülmemesinden kaynaklanır. Yani, güvenlik önlemlerinin sonradan eklenmeye çalışılması yerine, baştan tasarlanması gereken durumlarda ortaya çıkar.
+                </p>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Yaygın Örnekler</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">1. Weak Authentication Design (Zayıf Kimlik Doğrulama Tasarımı)</h3>
+                        <p class="text-gray-600">
+                            Örnek: Kimlik doğrulama sürecinin yetersiz tasarlanması.
+                        </p>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+// Kötü örnek
+class AuthService {
+    login(username, password) {
+        if (username && password) {
+            return true;
+        }
+        return false;
+    }
+}
+
+// İyi örnek
+class AuthService {
+    async login(username, password) {
+        const user = await this.findUser(username);
+        if (!user) {
+            throw new Error('Kullanıcı bulunamadı');
+        }
+        
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) {
+            throw new Error('Geçersiz şifre');
+        }
+        
+        return this.generateToken(user);
+    }
+}</pre>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">2. Insufficient Authorization Control (Yetersiz Yetkilendirme Kontrolü)</h3>
+                        <p class="text-gray-600">
+                            Örnek: Kullanıcı rollerinin ve izinlerinin yetersiz tasarlanması.
+                        </p>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+// Kötü örnek
+function checkAccess(user, resource) {
+    return user.isLoggedIn;
+}
+
+// İyi örnek
+class AccessControl {
+    async checkAccess(user, resource, action) {
+        const permissions = await this.getUserPermissions(user.id);
+        return permissions.some(p => 
+            p.resource === resource && 
+            p.action === action
+        );
+    }
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Korunma Yöntemleri</h2>
+                <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>Güvenlik mimarisini baştan tasarlayın</li>
+                    <li>Güvenlik gereksinimlerini belirleyin</li>
+                    <li>Güvenlik testleri yapın</li>
+                    <li>Güvenlik dokümantasyonu hazırlayın</li>
+                    <li>Güvenlik eğitimleri verin</li>
+                </ul>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Örnek Kod</h2>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Güvenli Tasarım Örneği</h3>
+                    <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+class SecureApplication {
+    constructor() {
+        this.authService = new AuthService();
+        this.accessControl = new AccessControl();
+        this.auditLogger = new AuditLogger();
+    }
+
+    async handleRequest(req, res) {
+        try {
+            // Kimlik doğrulama
+            const user = await this.authService.authenticate(req);
+            
+            // Yetkilendirme
+            const hasAccess = await this.accessControl.checkAccess(
+                user,
+                req.resource,
+                req.action
+            );
+            
+            if (!hasAccess) {
+                throw new Error('Yetkisiz erişim');
+            }
+            
+            // İşlemi gerçekleştir
+            const result = await this.processRequest(req);
+            
+            // Denetim kaydı
+            await this.auditLogger.log(user, req, result);
+            
+            return result;
+        } catch (error) {
+            await this.auditLogger.logError(error);
+            throw error;
+        }
+    }
+}</pre>
+                </div>
+            </section>
+        </article>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p>© 2025 Lokidres tarafından hazırlanmıştır.</p>
+            <p class="text-sm mt-2">Bu rehber, web uygulamalarınızı güvende tutmak için temel bir başlangıç noktasıdır.</p>
+        </div>
+    </footer>
+</body>
+</html> 

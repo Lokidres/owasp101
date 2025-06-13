@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software and Data Integrity (Yazılım ve Veri Bütünlüğü) | OWASP Top 10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-xl font-semibold text-gray-800">OWASP Top 10</div>
+                <div class="hidden md:flex space-x-4">
+                    <a href="index.html" class="text-gray-800 hover:text-blue-600">Ana Sayfa</a>
+                    <a href="sayfa1.html" class="text-gray-800 hover:text-blue-600">Broken Access Control</a>
+                    <a href="sayfa2.html" class="text-gray-800 hover:text-blue-600">Cryptographic Failures</a>
+                    <a href="sayfa3.html" class="text-gray-800 hover:text-blue-600">Injection</a>
+                    <a href="sayfa4.html" class="text-gray-800 hover:text-blue-600">Insecure Design</a>
+                    <a href="sayfa5.html" class="text-gray-800 hover:text-blue-600">Security Misconfiguration</a>
+                    <a href="sayfa6.html" class="text-gray-800 hover:text-blue-600">Vulnerable Components</a>
+                    <a href="sayfa7.html" class="text-gray-800 hover:text-blue-600">Authentication Failures</a>
+                    <a href="sayfa8.html" class="text-blue-600">Software and Data Integrity</a>
+                    <a href="sayfa9.html" class="text-gray-800 hover:text-blue-600">Logging Failures</a>
+                    <a href="sayfa10.html" class="text-gray-800 hover:text-blue-600">Server-Side Request Forgery</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <article class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Software and Data Integrity (Yazılım ve Veri Bütünlüğü)</h1>
+            
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Genel Bakış</h2>
+                <p class="text-gray-600 mb-4">
+                    Bu güvenlik açığı, yazılım güncellemelerinin, kritik verilerin ve CI/CD süreçlerinin güvenliğinin sağlanamamasından kaynaklanır. Yani, yazılım ve verilerin bütünlüğünün korunamaması durumunda ortaya çıkar.
+                </p>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Yaygın Örnekler</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">1. Insecure Update Mechanism (Güvensiz Güncelleme Mekanizması)</h3>
+                        <p class="text-gray-600">
+                            Örnek: Yazılım güncellemelerinin doğrulanmadan uygulanması.
+                        </p>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+// Kötü örnek
+async function updateSoftware(url) {
+    const response = await fetch(url);
+    const update = await response.json();
+    await installUpdate(update);
+}
+
+// İyi örnek
+class UpdateManager {
+    async updateSoftware(url) {
+        const response = await fetch(url);
+        const update = await response.json();
+        
+        // İmza doğrulama
+        const isValid = await this.verifySignature(update);
+        if (!isValid) {
+            throw new Error('Geçersiz güncelleme imzası');
+        }
+        
+        // Hash doğrulama
+        const hashValid = await this.verifyHash(update);
+        if (!hashValid) {
+            throw new Error('Geçersiz güncelleme hash\'i');
+        }
+        
+        await this.installUpdate(update);
+    }
+}</pre>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">2. Data Integrity Check (Veri Bütünlüğü Kontrolü)</h3>
+                        <p class="text-gray-600">
+                            Örnek: Kullanıcı verilerinin bütünlüğünün kontrol edilmemesi.
+                        </p>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+// Kötü örnek
+async function updateUserData(userId, data) {
+    await db.users.update(userId, data);
+}
+
+// İyi örnek
+class DataIntegrityManager {
+    async updateUserData(userId, data) {
+        // Veri doğrulama
+        this.validateData(data);
+        
+        // Veri bütünlüğü kontrolü
+        const currentData = await this.getUserData(userId);
+        const integrityCheck = await this.checkDataIntegrity(currentData, data);
+        if (!integrityCheck) {
+            throw new Error('Veri bütünlüğü ihlali');
+        }
+        
+        // Güncelleme
+        await this.updateData(userId, data);
+        
+        // Denetim kaydı
+        await this.auditLog.update(userId, data);
+    }
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Korunma Yöntemleri</h2>
+                <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>Dijital imza doğrulaması yapın</li>
+                    <li>Güvenli güncelleme mekanizmaları kullanın</li>
+                    <li>Veri bütünlüğü kontrolleri uygulayın</li>
+                    <li>CI/CD süreçlerini güvenli hale getirin</li>
+                    <li>Denetim kayıtları tutun</li>
+                </ul>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Örnek Kod</h2>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Secure Data Integrity Example (Güvenli Veri Bütünlüğü Örneği)</h3>
+                    <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+class IntegrityManager {
+    constructor() {
+        this.crypto = require('crypto');
+        this.validator = new DataValidator();
+    }
+
+    async verifyUpdate(update) {
+        // İmza doğrulama
+        const signature = update.signature;
+        const isValid = await this.verifySignature(update.data, signature);
+        if (!isValid) {
+            throw new Error('Geçersiz imza');
+        }
+
+        // Hash doğrulama
+        const hash = this.calculateHash(update.data);
+        if (hash !== update.hash) {
+            throw new Error('Hash doğrulaması başarısız');
+        }
+
+        // Veri doğrulama
+        const isValidData = this.validator.validate(update.data);
+        if (!isValidData) {
+            throw new Error('Geçersiz veri formatı');
+        }
+
+        return true;
+    }
+
+    async processData(data) {
+        // Veri bütünlüğü kontrolü
+        const integrityCheck = await this.checkIntegrity(data);
+        if (!integrityCheck) {
+            throw new Error('Veri bütünlüğü ihlali');
+        }
+
+        // Veri işleme
+        const processedData = await this.process(data);
+        
+        // Yeni hash oluştur
+        const newHash = this.calculateHash(processedData);
+        
+        return {
+            data: processedData,
+            hash: newHash,
+            timestamp: Date.now()
+        };
+    }
+}</pre>
+                </div>
+            </section>
+        </article>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p>© 2025 Lokidres tarafından hazırlanmıştır.</p>
+            <p class="text-sm mt-2">Bu rehber, web uygulamalarınızı güvende tutmak için temel bir başlangıç noktasıdır.</p>
+        </div>
+    </footer>
+</body>
+</html> 

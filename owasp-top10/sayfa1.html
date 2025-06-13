@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broken Access Control (Kırık Erişim Kontrolü) | OWASP Top 10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-xl font-semibold text-gray-800">OWASP Top 10</div>
+                <div class="hidden md:flex space-x-4">
+                    <a href="index.html" class="text-gray-800 hover:text-blue-600">Ana Sayfa</a>
+                    <a href="sayfa1.html" class="text-blue-600">Broken Access Control</a>
+                    <a href="sayfa2.html" class="text-gray-800 hover:text-blue-600">Cryptographic Failures</a>
+                    <a href="sayfa3.html" class="text-gray-800 hover:text-blue-600">Injection</a>
+                    <a href="sayfa4.html" class="text-gray-800 hover:text-blue-600">Insecure Design</a>
+                    <a href="sayfa5.html" class="text-gray-800 hover:text-blue-600">Security Misconfiguration</a>
+                    <a href="sayfa6.html" class="text-gray-800 hover:text-blue-600">Vulnerable Components</a>
+                    <a href="sayfa7.html" class="text-gray-800 hover:text-blue-600">Authentication Failures</a>
+                    <a href="sayfa8.html" class="text-gray-800 hover:text-blue-600">Software and Data Integrity</a>
+                    <a href="sayfa9.html" class="text-gray-800 hover:text-blue-600">Logging Failures</a>
+                    <a href="sayfa10.html" class="text-gray-800 hover:text-blue-600">Server-Side Request Forgery</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <article class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Broken Access Control (Kırık Erişim Kontrolü)</h1>
+            
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Genel Bakış</h2>
+                <p class="text-gray-600 mb-4">
+                    Bu güvenlik açığı, kullanıcıların yetkileri olmayan kaynaklara erişebilmesinden kaynaklanır. Yani, bir kullanıcının sadece kendi verilerine erişebilmesi gerekirken, başka kullanıcıların verilerine de erişebilmesi durumunda ortaya çıkar.
+                </p>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Yaygın Örnekler</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">1. IDOR (Insecure Direct Object Reference - Güvensiz Doğrudan Nesne Referansı)</h3>
+                        <p class="text-gray-600">
+                            Örnek: Kullanıcının başka bir kullanıcının profilini görüntüleyebilmesi.
+                        </p>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+// Kötü örnek 
+app.get('/profile/:id', (req, res) => {
+    const user = getUserById(req.params.id);
+    res.send(user);
+});
+
+// İyi örnek 
+app.get('/profile/:id', (req, res) => {
+    if (req.user.id !== req.params.id) {
+        return res.status(403).send('Yetkisiz erişim');
+    }
+    const user = getUserById(req.params.id);
+    res.send(user);
+});</pre>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">2. Missing Access Control (Eksik Erişim Kontrolü)</h3>
+                        <p class="text-gray-600">
+                            Örnek: Kullanıcının yetkisi olmayan işlemleri gerçekleştirebilmesi.
+                        </p>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+// Kötü örnek
+app.post('/users/:id/delete', (req, res) => {
+    deleteUser(req.params.id);
+    res.send('Kullanıcı silindi');
+});
+
+// İyi örnek
+app.post('/users/:id/delete', (req, res) => {
+    if (!req.user.isAdmin) {
+        return res.status(403).send('Yetkisiz erişim');
+    }
+    deleteUser(req.params.id);
+    res.send('Kullanıcı silindi');
+});</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Korunma Yöntemleri</h2>
+                <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>Yetkilendirme kontrollerini uygulayın</li>
+                    <li>Kullanıcı rollerini doğru yönetin</li>
+                    <li>Erişim kontrollerini merkezi hale getirin</li>
+                    <li>API endpoint'lerini güvenli hale getirin</li>
+                    <li>Düzenli güvenlik testleri yapın</li>
+                </ul>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Örnek Kod</h2>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Güvenli Erişim Kontrolü</h3>
+                    <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+class AccessControl {
+    static async checkPermission(user, resource, action) {
+        const permissions = await this.getUserPermissions(user.id);
+        return permissions.some(p => 
+            p.resource === resource && 
+            p.action === action
+        );
+    }
+
+    static async validateAccess(req, res, next) {
+        const { resource, action } = req.route;
+        const hasPermission = await this.checkPermission(
+            req.user,
+            resource,
+            action
+        );
+        
+        if (!hasPermission) {
+            return res.status(403).send('Yetkisiz erişim');
+        }
+        next();
+    }
+}</pre>
+                </div>
+            </section>
+        </article>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p>© 2025 Lokidres tarafından hazırlanmıştır.</p>
+            <p class="text-sm mt-2">Bu rehber, web uygulamalarınızı güvende tutmak için temel bir başlangıç noktasıdır.</p>
+        </div>
+    </footer>
+</body>
+</html> 

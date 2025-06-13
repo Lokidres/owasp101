@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptographic Failures (Kriptografik Hatalar) | OWASP Top 10</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="text-xl font-semibold text-gray-800">OWASP Top 10</div>
+                <div class="hidden md:flex space-x-4">
+                    <a href="index.html" class="text-gray-800 hover:text-blue-600">Ana Sayfa</a>
+                    <a href="sayfa1.html" class="text-gray-800 hover:text-blue-600">Broken Access Control</a>
+                    <a href="sayfa2.html" class="text-blue-600">Cryptographic Failures</a>
+                    <a href="sayfa3.html" class="text-gray-800 hover:text-blue-600">Injection</a>
+                    <a href="sayfa4.html" class="text-gray-800 hover:text-blue-600">Insecure Design</a>
+                    <a href="sayfa5.html" class="text-gray-800 hover:text-blue-600">Security Misconfiguration</a>
+                    <a href="sayfa6.html" class="text-gray-800 hover:text-blue-600">Vulnerable Components</a>
+                    <a href="sayfa7.html" class="text-gray-800 hover:text-blue-600">Authentication Failures</a>
+                    <a href="sayfa8.html" class="text-gray-800 hover:text-blue-600">Software and Data Integrity</a>
+                    <a href="sayfa9.html" class="text-gray-800 hover:text-blue-600">Logging Failures</a>
+                    <a href="sayfa10.html" class="text-gray-800 hover:text-blue-600">Server-Side Request Forgery</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+        <article class="bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">Cryptographic Failures (Kriptografik Hatalar)</h1>
+            
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Genel Bakış</h2>
+                <p class="text-gray-600 mb-4">
+                    Bu güvenlik açığı, hassas verilerin yeterince güçlü şifreleme yöntemleriyle korunmamasından kaynaklanır. Yani, verilerin şifrelenmeden saklanması veya zayıf şifreleme algoritmalarının kullanılması durumunda ortaya çıkar.
+                </p>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Yaygın Örnekler</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">1. Weak Encryption (Zayıf Şifreleme)</h3>
+                        <p class="text-gray-600">
+                            Örnek: Eski veya güvensiz şifreleme algoritmalarının kullanılması.
+                        </p>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+// Kötü örnek
+const crypto = require('crypto');
+const encrypted = crypto.createCipher('des', key)
+    .update(data)
+    .final('hex');
+
+// İyi örnek
+const crypto = require('crypto');
+const algorithm = 'aes-256-gcm';
+const key = crypto.scryptSync(password, 'salt', 32);
+const iv = crypto.randomBytes(16);
+const cipher = crypto.createCipheriv(algorithm, key, iv);
+const encrypted = Buffer.concat([
+    cipher.update(data, 'utf8'),
+    cipher.final()
+]);</pre>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">2. Plaintext Storage (Düz Metin Saklama)</h3>
+                        <p class="text-gray-600">
+                            Örnek: Hassas verilerin şifrelenmeden saklanması.
+                        </p>
+                        <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+// Kötü örnek
+function saveUserData(user) {
+    db.users.insert({
+        name: user.name,
+        email: user.email,
+        password: user.password
+    });
+}
+
+// İyi örnek
+async function saveUserData(user) {
+    const hashedPassword = await bcrypt.hash(user.password, 12);
+    db.users.insert({
+        name: user.name,
+        email: user.email,
+        password: hashedPassword
+    });
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Korunma Yöntemleri</h2>
+                <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>Güçlü şifreleme algoritmaları kullanın</li>
+                    <li>Güvenli anahtar yönetimi yapın</li>
+                    <li>Hassas verileri şifreleyin</li>
+                    <li>SSL/TLS kullanın</li>
+                    <li>Şifreleme anahtarlarını güvenli saklayın</li>
+                </ul>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Örnek Kod</h2>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Güvenli Şifreleme Örneği</h3>
+                    <pre class="bg-gray-800 text-white p-4 rounded-lg mt-2 overflow-x-auto">
+const crypto = require('crypto');
+
+class Encryption {
+    static async encrypt(data, key) {
+        const iv = crypto.randomBytes(16);
+        const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+        
+        const encrypted = Buffer.concat([
+            cipher.update(data, 'utf8'),
+            cipher.final()
+        ]);
+        
+        const authTag = cipher.getAuthTag();
+        
+        return {
+            iv: iv.toString('hex'),
+            encrypted: encrypted.toString('hex'),
+            authTag: authTag.toString('hex')
+        };
+    }
+
+    static async decrypt(encrypted, key, iv, authTag) {
+        const decipher = crypto.createDecipheriv(
+            'aes-256-gcm',
+            key,
+            Buffer.from(iv, 'hex')
+        );
+        
+        decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+        
+        return decipher.update(encrypted, 'hex', 'utf8') +
+               decipher.final('utf8');
+    }
+}</pre>
+                </div>
+            </section>
+        </article>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p>© 2025 Lokidres tarafından hazırlanmıştır.</p>
+            <p class="text-sm mt-2">Bu rehber, web uygulamalarınızı güvende tutmak için temel bir başlangıç noktasıdır.</p>
+        </div>
+    </footer>
+</body>
+</html> 
