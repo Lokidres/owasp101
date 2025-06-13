@@ -37,6 +37,8 @@ git clone https://github.com/kullaniciadi/owasp101.git
 
 3. İlgilendiğiniz güvenlik açığının sayfasına gidin
 
+- Veya https://lokidres.github.io/owasp101 adresine gidip istediginiz açığın üstüne tıklayarak öğrenebilirsiniz.
+
 ## 🛠️ Teknolojiler
 
 - HTML5
